@@ -1,9 +1,8 @@
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++98 -pedantic -Iinc/ -g3 -fsanitize=address
 SRCDIR = src/
-GNL = get_next_line
 SRCFIL = main.cpp BlockOBJ.cpp ConfigParser.cpp Engine.cpp Location.cpp Http.cpp Server.cpp\
-		Request.cpp ConnectionManager.cpp Cgi.cpp #$(GNL)/get_next_line.cpp $(GNL)/get_next_line_utils.cpp
+		Request.cpp ConnectionManager.cpp Cgi.cpp Response.cpp
 SRCS = $(addprefix $(SRCDIR),$(SRCFIL))
 OBJS = $(SRCS:.cpp=.o)
 NAME = webserv

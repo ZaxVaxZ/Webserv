@@ -4,6 +4,7 @@
 # include <iostream>
 # include <exception>
 # include <algorithm>
+# include <cstdio>
 # include <unistd.h>
 # include <fcntl.h>
 # include <vector>
@@ -21,6 +22,7 @@
 # include "BlockOBJ.hpp"
 # include "Location.hpp"
 # include "Request.hpp"
+# include "Response.hpp"
 
 typedef std::string str;
 
@@ -34,18 +36,18 @@ class Server: public BlockOBJ
 			INCOMPLETE,
 			FINISH
 		}	ResponseState;
-		int						file_fd, min_del_depth;
-		ssize_t					total_length;
-		str						root, header, body;
-		bool					keep_alive, autoindex;
+
+		str						root;
+		bool					autoindex;
+		unsigned int			min_del_depth;
+		std::map<int, Response>	response;
 		const static str		default_ip, default_port, directives[];
 		std::vector<str>		names, ips, ports, index;
 		std::map<str, str>		error_pages;
-		std::map<str, str>		http_codes;
 		std::vector<Location *>	locations;
 		ResponseState			responseState;
 
-		void			handleError(str error_code, std::stringstream &resp);
+		void			handleError(str error_code, int client_fd);
 		bool			validAddress(str address);
 		bool			handleAddress(str address);
 		str				reasonPhrase(str status);
@@ -53,8 +55,10 @@ class Server: public BlockOBJ
 		str				errorPage(str status);
 		str				ssizeToStr(ssize_t x);
 		bool			isDirectory(const std::string& path);
-		void			directoryResponse(str path, std::stringstream &resp);
-		void			fileResponse(str path, std::stringstream &resp, bool checking_index);
+		// void			directoryResponse(str path, std::stringstream &resp);
+		void 			directoryResponse(Request* req, str path, int client_fd);
+		// void			fileResponse(str path, bool checking_index);
+		void			fileResponse(Request* req, str path, int file_fd, int client_fd);
 		// unsigned int	fileSize(int fd);
 
 	public:
@@ -70,6 +74,7 @@ class Server: public BlockOBJ
 		BlockOBJ				*handleBlock(std::queue<str> opts);
 		void					setDefault();
 		Socket*					init_listeners();
+		void 					handleError(str error_code);
 
 		/********************/
 		/*		getters		*/
